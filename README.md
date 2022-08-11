@@ -1,70 +1,174 @@
-# Getting Started with Create React App
+# Following along the ReactJS Library's tutorial - Tic Tac Toe
+THis is my follow along on the [official react tutorial] to get familiar to react and it's syntax before starting my BeCode exercise to make a quiz app in React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## The Start
+- I already miss angular
+    - I used `npx create-react-app tic-tac-toe" and instantly npm is giving me warnings about outdate packages.... Ah well,.... I guess react is exactly what I feared.
+    - After running out npm start and having a look in the files, I followed the tutorial's next step. `rm -rf src/*` rip boilerplate.
+    - Now I have to setup the files for the tutorial
+        - `touch /src/index.css`
+        - `touch /src/index.js`
+        - Copy pasta [the provided code....](https://codepen.io/gaearon/pen/oWWQNa)
+    - And add React to the index.js file.
+        - `import React from 'react';`
+        - `import ReactDOM from 'react-dom/client';`
+    - Link the css file
+        - `import './index.css';`
+    - Run `npm start` to test the server
+        - Got the little square now.
 
-## Available Scripts
+## What Is React?
+    - a JavaScript Library to build UIs
+    - Component based
 
-In the project directory, you can run:
+## First impressions
+    - This is hell
+    - Seems like they had lovely potatoes, and mashed them with a hammer and then without showing the process gave us a lovely plate of mashed potatoes
+    - `React has a few different kinds of components, but we’ll start with React.Component subclasses:`
+        - At least please just give me a link to the different kinds. Ah well, let's join the hipster train. grow a beard and follow along
 
-### `npm start`
+## React.Component Subclasses
+    - I get an example.
+    - apparently I am now working with a 
+        - `React Component Class` - Also called - `React Component Type`
+            - Class Components take in Parameters
+                - React calls them props for properties
+                **Gotta love them hipsters, now paramaters are properties ?damn zucker so this is how you came up with - The Metaverse -`**
+            - Class Components return a view trough a `render()` method.
+                - Render returns a _React Element_
+                    - Basicly a little description of what to render.
+            - JSX
+                - React advices the use of JSX since it makes the html structure easier to write.
+                - Example of JSX in the return function, since its pretty unclear in the tutorial.(Yes I will hate untill you show me that trough your popularity you can get me a better guide towards using your library than Angular or Svelte.) :
+```js
+    //Call the return function
+    return (
+        //Crate a div. since it's a class component I give it a name
+        React.createElement('div',{className:'shopping-list'},
+        //Add elements to the div
+        //Adding a hello world
+        React.createElement('h1',
+            'Hello World'
+        );
+        //Adding a list
+        React.createElement('ul',
+        //Adding list items
+            react.createElement('li','List item one')
+            react.createElement('li','List item two')
+            react.createElement('li','List item  three')
+        )
+        //close the div
+        )
+    )
+```
+- This tutorial uses JSX instead of createElement() - No reason given - 
+    - JSX comes with the full power of JavaScript
+        - JSX allows any JavaScript expression within braces
+        - Every React element is a JavaScript object
+        - JSX also allows the rendering of custom React components.
+            - For Example: `<ShoppingList />`
+            - Every component is encapsulated and can operate independently
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Inspecting the starter code.
+    - The code contains 3 components
+        - Square
+            - Renders one button
+        - Board
+            - Reneders 9 squares
+        - Game
+            - Renders a board with a placeholder.
+    - The code is static, there is no interaction
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Passing Data Trough Props
+    - Change the board's `renderSquare()` method so it passes a value to the square
+    - Now make the square render the passed in prop
+        - Its so weird we do not have a constructor, looks like a lot of magic numbers being replaced by the magical prop for now...
+RECAP - Passing the magical props is how information flows in React
 
-### `npm test`
+## Making a Component interactive
+    - Mission: Fill the square with an X, when it's clicked turn it into an 'O'
+        - Adding the event listener
+            - `<button onClick={()=>{console.log('Hello click')}}></button>
+            - ! writing onClick={console.log('click)} will fire every time the component rerenders. aka bad
+    
+    - Make the square _remember_ that it got clicked
+        - STATE
+            - COmponents can have state by setting this.state in their constructors
+            - this.state should be handled as a private to a React component it's defined in.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+        - Finally Adding the constructor!
+```js
+class Square extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: null,
+    };
+  }
 
-### `npm run build`
+  render() {
+    return (
+      <button
+        className="square"
+        onClick={() => this.setState({value: 'X'})}
+      >
+        {this.state.value}
+      </button>
+    );
+  }
+}
+```
+- When you call setState in a component, React automatically updates the child components inside of it too.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Lifting State up - AKA split dumb n smart components.
+! I got hope! now, look at this. They admit everything up untill now should be itchy to me.
+```the best approach is to store the game’s state in the parent Board component instead of in each Square. ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- To collect data from multiple children
+- To have two children communicate with eachother
+    - We declare the shared state in their parent component
+    - The parent component can pass in the shared state by using props
+    - This way every component stays in sync
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Why Immutability is important
+- When changing data, chainging it without mutation is important.
+    - We do not change the original data directly
+        - We copy, apply changes, replace the original because:
+            - Complexity becomes simplicity
+                - A big benefit is for example being able to undo a change, since we never destroyed the previous values.
+                - Detecting changes
+                    - When we change something underlying code can look at the difference between the new and the old value, since we never changed the old value.
+                - When to Re-Render in react
+                    - Immutabilty helps building _pure components_
+                        - Immutable data can determine if changes were made.
+                            - This helps determine when to re-render
+***
+## Functional Components
+    - Funcitonal components are a simpler way to write components that:
+        - Only contain a render method
+        - Do not have their own state
+    - We create one by:
+        - Writing a function that:
+            - Takes 'props' as input.
+            - returns JSX that has to be rendered
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Copy Pasta la magica
+    - Turn the square into a functional component
+- Use provided algorithm
+    - Use it to do some if checks to determine the winner.
+    - Make sure the same square cannot be clicked twice.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Adding Time travel.
+- IMMUTABLE DATA SEEMS VERY IMPORTANT TO REACT
+```
+Unlike the array push() method you might be more familiar with, the concat() method doesn’t mutate the original array, so we prefer it.
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- MAP()
+```js
+/*
+In JavaScript, arrays have a map() method that is commonly used for mapping data to other data, for example:*/
+const numbers = [1, 2, 3];
+const doubled = numbers.map(x => x * 2); // [2, 4, 6]
+```
